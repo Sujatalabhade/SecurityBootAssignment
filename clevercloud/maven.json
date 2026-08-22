@@ -1,0 +1,9 @@
+{
+  "build": {
+    "type": "maven",
+    "goal": "clean package -DskipTests"
+  },
+  "deploy": {
+    "jarName": "./backend/target/dmart-backend-0.0.1-SNAPSHOT.jar"
+  }
+}
