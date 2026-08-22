@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { register } from '../../api/auth';
 import toast from 'react-hot-toast';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, ArrowLeft } from 'lucide-react';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', phone: '', address: '' });
@@ -19,7 +19,7 @@ const RegisterPage = () => {
       toast.success('Registration successful! Please log in.');
       navigate('/login');
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Registration failed');
+      toast.error(err.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -28,6 +28,11 @@ const RegisterPage = () => {
   return (
     <div className="page-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
       <div className="card animate-slide-up" style={{ width: '100%', maxWidth: '500px' }}>
+        
+        <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem', marginBottom: '1.5rem' }} className="btn-ghost">
+          <ArrowLeft size={16} /> Back to Home
+        </Link>
+
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <h2 className="gradient-text" style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Create Account</h2>
           <p style={{ color: 'var(--text-muted)' }}>Join D-Mart for premium groceries</p>

@@ -38,4 +38,13 @@ public class AuthController {
     public ResponseEntity<ApiResponse<User>> getMe(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Current user retrieved", user));
     }
+
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse<User>> updateProfile(
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody com.dmart.dto.request.UpdateProfileRequest request,
+            HttpServletRequest httpRequest) {
+        User updatedUser = authService.updateProfile(user.getId(), request, httpRequest);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Profile updated successfully", updatedUser));
+    }
 }

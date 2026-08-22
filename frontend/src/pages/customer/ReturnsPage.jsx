@@ -26,8 +26,8 @@ const ReturnsPage = () => {
   const fetchData = async () => {
     try {
       const [returnsData, ordersData] = await Promise.all([getMyReturns(), getOrders()]);
-      setReturns(returnsData);
-      setOrders(ordersData.filter(o => o.status === 'DELIVERED'));
+      setReturns(Array.isArray(returnsData) ? returnsData : []);
+      setOrders(Array.isArray(ordersData) ? ordersData.filter(o => o.status === 'DELIVERED') : []);
     } catch (err) {
       toast.error('Failed to fetch data');
     } finally {
@@ -38,33 +38,37 @@ const ReturnsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createReturn(formData);
+      await createReturn({
+        ...formData,
+        orderId: Number(formData.orderId),
+        productId: Number(formData.productId)
+      });
       toast.success('Return requested successfully');
       setFormData({ orderId: '', productId: '', reason: '', type: 'RETURN' });
       fetchData();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to request return');
+      toast.error(err.response?.data?.message || 'Failed to request return');
     }
   };
 
-  if (loading) return <LoadingSpinner fullScreen />;
+  if (loading) return <LoadingSpinner />;
 
-  const selectedOrder = orders.find(o => o.id === formData.orderId);
+  const selectedOrder = orders.find(o => String(o.id) === String(formData.orderId));
 
   return (
-    <div className="container animate-fade-in" style={{ padding: '2rem 0' }}>
+    <div className="container animate-fade-in" style={{ padding: '2rem 1rem' }}>
       <h1 style={{ marginBottom: '2rem' }}>Returns & Exchanges</h1>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem', '@media(minWidth: 992px)': { gridTemplateColumns: '1fr 1fr' } }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
         <div className="card">
           <h3 style={{ marginBottom: '1.5rem' }}>Request Return / Exchange</h3>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem' }}>Select Order</label>
-              <select className="select" value={formData.orderId} onChange={(e) => setFormData({...formData, orderId: e.target.value})} required>
+              <select className="select" value={formData.orderId} onChange={(e) => setFormData({...formData, orderId: e.target.value, productId: ''})} required>
                 <option value="">-- Choose Order --</option>
                 {orders.map(o => (
-                  <option key={o.id} value={o.id}>Order #{o.id.slice(0,8)} ({new Date(o.createdAt).toLocaleDateString()})</option>
+                  <option key={o.id} value={o.id}>Order #{o.id} ({new Date(o.createdAt).toLocaleDateString()})</option>
                 ))}
               </select>
             </div>
@@ -74,8 +78,8 @@ const ReturnsPage = () => {
                 <label style={{ display: 'block', marginBottom: '0.5rem' }}>Select Product</label>
                 <select className="select" value={formData.productId} onChange={(e) => setFormData({...formData, productId: e.target.value})} required>
                   <option value="">-- Choose Product --</option>
-                  {selectedOrder.items.map(item => (
-                    <option key={item.product.id} value={item.product.id}>{item.product.name}</option>
+                  {selectedOrder.items?.map(item => (
+                    <option key={item.product?.id} value={item.product?.id}>{item.product?.name}</option>
                   ))}
                 </select>
               </div>
@@ -112,8 +116,8 @@ const ReturnsPage = () => {
                     <div className="badge badge-info">{r.type}</div>
                     <OrderStatusBadge status={r.status} />
                   </div>
-                  <h4>{r.product.name}</h4>
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>Order #{r.order.id.slice(0,8)}</div>
+                  <h4>{r.product?.name}</h4>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>Order #{r.orderId}</div>
                   <p style={{ marginTop: '1rem', fontSize: '0.95rem' }}>"{r.reason}"</p>
                   {r.staffNotes && (
                     <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '8px', borderLeft: '3px solid var(--warning)' }}>

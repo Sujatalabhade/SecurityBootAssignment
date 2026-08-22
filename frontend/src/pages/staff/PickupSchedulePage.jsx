@@ -48,18 +48,18 @@ const PickupSchedulePage = () => {
           orders.map(o => (
             <div key={o.id} className="card">
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                <h3 style={{ margin: 0 }}>Order #{o.id.slice(0,8)}</h3>
+                <h3 style={{ margin: 0 }}>Order #{o.id}</h3>
                 <OrderStatusBadge status={o.status} />
               </div>
-              <p style={{ color: 'var(--text-muted)', marginBottom: '0.5rem' }}>User: {o.user.name}</p>
+              <p style={{ color: 'var(--text-muted)', marginBottom: '0.5rem' }}>User: {o.userName}</p>
               {o.scheduledTime && (
                 <p style={{ color: 'var(--primary)', fontWeight: 'bold', marginBottom: '1rem' }}>
-                  Time: {new Date(o.scheduledTime).toLocaleString()}
+                  Time: {new Date(o.scheduledTime).toLocaleString('en-IN')}
                 </p>
               )}
               <div style={{ background: 'var(--surface2)', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
-                {o.items.map(i => (
-                  <div key={i.id} style={{ fontSize: '0.9rem' }}>{i.quantity}x {i.product.name}</div>
+                {o.items?.map(i => (
+                  <div key={i.id} style={{ fontSize: '0.9rem' }}>{i.quantity}x {i.product?.name}</div>
                 ))}
               </div>
               {o.status === 'READY_FOR_PICKUP' && (

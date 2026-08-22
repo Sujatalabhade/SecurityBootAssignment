@@ -68,10 +68,10 @@ const CheckoutPage = () => {
 
   if (loading) return <LoadingSpinner fullScreen />;
 
-  const subtotal = cart.items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-  const tax = Math.round(subtotal * 0.05);
+  const subtotal = cart?.items?.reduce((sum, item) =>
+    sum + Number(item.subtotal ?? (item.product?.price * item.quantity) ?? 0), 0) || 0;
   const deliveryFee = deliveryType === 'HOME_DELIVERY' ? 50 : 0;
-  const total = subtotal + tax + deliveryFee;
+  const total = subtotal + deliveryFee;
 
   return (
     <div className="container animate-fade-in" style={{ padding: '2rem 0' }}>
@@ -165,8 +165,8 @@ const CheckoutPage = () => {
             <div style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {cart.items.map(item => (
                 <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
-                  <span>{item.quantity}x {item.product.name}</span>
-                  <span>₹{item.product.price * item.quantity}</span>
+                  <span>{item.quantity}x {item.product?.name}</span>
+                  <span>₹{Number(item.subtotal ?? (item.product?.price * item.quantity) ?? 0).toFixed(2)}</span>
                 </div>
               ))}
             </div>
@@ -176,14 +176,9 @@ const CheckoutPage = () => {
               <span>₹{subtotal}</span>
             </div>
             
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-              <span style={{ color: 'var(--text-muted)' }}>Tax</span>
-              <span>₹{tax}</span>
-            </div>
-            
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--border)' }}>
               <span style={{ color: 'var(--text-muted)' }}>Delivery Fee</span>
-              <span>₹{deliveryFee}</span>
+              <span>{deliveryFee > 0 ? `₹${deliveryFee}` : 'Free'}</span>
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', fontSize: '1.25rem', fontWeight: 'bold' }}>

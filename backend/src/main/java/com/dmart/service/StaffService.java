@@ -29,7 +29,7 @@ public class StaffService {
     }
 
     public PageResponse<OrderResponse> getPendingOrders(int page, int size) {
-        Page<Order> orderPage = orderRepository.findByStatus(OrderStatus.PENDING, PageRequest.of(page, size, Sort.by("createdAt").ascending()));
+        Page<Order> orderPage = orderRepository.findAll(PageRequest.of(page, size, Sort.by("createdAt").descending()));
         List<OrderResponse> content = orderPage.getContent().stream()
                 .map(orderService::mapToOrderResponse)
                 .collect(Collectors.toList());

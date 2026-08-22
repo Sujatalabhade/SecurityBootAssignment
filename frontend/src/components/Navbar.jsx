@@ -17,7 +17,7 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Menu */}
-        <div style={{ display: 'none', gap: '1.5rem', alignItems: 'center', '@media(minWidth: 768px)': { display: 'flex' } }} className="desktop-nav">
+        <div className="desktop-nav">
           <Link to="/products" className="btn-ghost" style={{ textDecoration: 'none' }}>Shop</Link>
           
           {isAuthenticated ? (
@@ -27,16 +27,21 @@ const Navbar = () => {
                   Dashboard
                 </Link>
               )}
+              {user?.role === 'CUSTOMER' && (
+                <Link to="/orders" className="btn-ghost" style={{ textDecoration: 'none' }}>
+                  My Orders
+                </Link>
+              )}
               
-              <Link to="/cart" className="btn-ghost" style={{ textDecoration: 'none', position: 'relative' }}>
+              <Link to="/cart" className="btn-ghost" style={{ textDecoration: 'none', position: 'relative' }} title="Shopping Cart">
                 <ShoppingCart size={20} />
               </Link>
               
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <Link to="/profile" className="btn-ghost" style={{ textDecoration: 'none' }}>
+                <Link to="/profile" className="btn-ghost" style={{ textDecoration: 'none' }} title="My Profile">
                   <User size={20} />
                 </Link>
-                <button onClick={logout} className="btn btn-ghost" style={{ padding: '0.5rem' }}>
+                <button onClick={logout} className="btn btn-ghost" style={{ padding: '0.5rem' }} title="Logout">
                   <LogOut size={20} />
                 </button>
               </div>
@@ -50,7 +55,7 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Toggle */}
-        <button className="btn-ghost desktop-hidden" onClick={() => setIsOpen(!isOpen)} style={{ padding: '0.5rem', display: 'block', '@media(minWidth: 768px)': { display: 'none' } }}>
+        <button className="btn-ghost desktop-hidden" onClick={() => setIsOpen(!isOpen)} style={{ padding: '0.5rem' }}>
           {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
@@ -61,6 +66,7 @@ const Navbar = () => {
           <Link to="/products" onClick={() => setIsOpen(false)} style={{ color: 'var(--text)', textDecoration: 'none' }}>Shop</Link>
           {isAuthenticated ? (
             <>
+              <Link to="/orders" onClick={() => setIsOpen(false)} style={{ color: 'var(--text)', textDecoration: 'none' }}>My Orders</Link>
               <Link to="/cart" onClick={() => setIsOpen(false)} style={{ color: 'var(--text)', textDecoration: 'none' }}>Cart</Link>
               <Link to="/profile" onClick={() => setIsOpen(false)} style={{ color: 'var(--text)', textDecoration: 'none' }}>Profile</Link>
               <button onClick={() => { logout(); setIsOpen(false); }} className="btn btn-ghost" style={{ justifyContent: 'flex-start', padding: 0 }}>Logout</button>

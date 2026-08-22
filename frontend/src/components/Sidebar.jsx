@@ -13,6 +13,9 @@ const Sidebar = () => {
   if (user.role === 'STAFF' || user.role === 'MANAGER' || user.role === 'ADMIN') {
     links.push({ to: '/staff', icon: <LayoutDashboard size={20} />, label: 'Staff Dashboard' });
     links.push({ to: '/staff/orders', icon: <ClipboardList size={20} />, label: 'Order Queue' });
+  }
+
+  if (user.role === 'STAFF' || user.role === 'ADMIN') {
     links.push({ to: '/staff/pickup', icon: <ShoppingBag size={20} />, label: 'Pickups' });
     links.push({ to: '/staff/returns', icon: <RotateCcw size={20} />, label: 'Returns' });
   }
@@ -30,7 +33,7 @@ const Sidebar = () => {
   }
 
   return (
-    <div className="card" style={{ width: '250px', height: '100%', borderRadius: 0, padding: '1rem 0' }}>
+    <div className="card sidebar" style={{ borderRadius: 0, padding: '1rem 0' }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         {links.map((link) => (
           <NavLink

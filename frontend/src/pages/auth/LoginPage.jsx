@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../../api/auth';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { LogIn } from 'lucide-react';
+import { LogIn, ArrowLeft } from 'lucide-react';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -26,20 +26,31 @@ const LoginPage = () => {
       else navigate('/products');
       
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Login failed');
+      toast.error(err.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);
     }
   };
 
   const fillDemo = (role) => {
+    const passwords = {
+      CUSTOMER: 'Customer@123',
+      STAFF: 'Staff@123',
+      MANAGER: 'Manager@123',
+      ADMIN: 'Admin@123',
+    };
     setEmail(`${role.toLowerCase()}@dmart.com`);
-    setPassword('password123');
+    setPassword(passwords[role]);
   };
 
   return (
     <div className="page-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
       <div className="card animate-slide-up" style={{ width: '100%', maxWidth: '400px' }}>
+        
+        <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem', marginBottom: '1.5rem' }} className="btn-ghost">
+          <ArrowLeft size={16} /> Back to Home
+        </Link>
+
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <h2 className="gradient-text" style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Welcome Back</h2>
           <p style={{ color: 'var(--text-muted)' }}>Sign in to continue to D-Mart</p>

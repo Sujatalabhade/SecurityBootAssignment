@@ -33,26 +33,19 @@ import { useAuth } from './context/AuthContext';
 function App() {
   const { user } = useAuth();
   const location = useLocation();
-  const noNavRoutes = ['/login', '/register', '/unauthorized', '/*'];
-  
-  // Show nav on most pages except auth/error
-  const showNav = !noNavRoutes.some(path => {
-    if (path === '/*') return false; // Handled separately if needed
-    return location.pathname.startsWith(path);
-  });
-
-  const showSidebar = user && user.role !== 'CUSTOMER' && location.pathname !== '/' && location.pathname !== '/products' && !location.pathname.startsWith('/products/');
+  const authOnlyPaths = ['/login', '/register'];
+  const showNav = !authOnlyPaths.includes(location.pathname);
+  const showSidebar = user && user.role !== 'CUSTOMER' &&
+    location.pathname !== '/' &&
+    !location.pathname.startsWith('/products') &&
+    !authOnlyPaths.includes(location.pathname);
 
   return (
     <div className="page-wrapper">
       {showNav && <Navbar />}
       
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        {showSidebar && (
-          <div style={{ display: 'none', '@media(minWidth: 768px)': { display: 'block' } }} className="desktop-sidebar">
-            <Sidebar />
-          </div>
-        )}
+        {showSidebar && <Sidebar />}
         
         <main style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
           <Routes>

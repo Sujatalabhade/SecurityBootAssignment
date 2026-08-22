@@ -15,7 +15,7 @@ const ReturnsProcessingPage = () => {
   const fetchReturns = async () => {
     try {
       const data = await getPendingReturns();
-      setReturns(data);
+      setReturns(Array.isArray(data) ? data : []);
     } catch (err) {
       toast.error('Failed to fetch returns');
     } finally {
@@ -23,52 +23,54 @@ const ReturnsProcessingPage = () => {
     }
   };
 
-  const handleProcess = async (id, status) => {
-    const notes = prompt(`Enter notes for ${status.toLowerCase()}:`);
-    if (notes === null) return;
-    
+  const handleProcess = async (id, approved) => {
+    const notes = prompt(`Enter optional notes for this decision:`);
+    if (notes === null) return; // user cancelled prompt
+
     try {
-      await processReturn(id, { status, staffNotes: notes });
-      toast.success('Return processed');
+      await processReturn(id, approved, notes);
+      toast.success(approved ? 'Return approved' : 'Return rejected');
       fetchReturns();
     } catch (err) {
-      toast.error('Failed to process');
+      toast.error(err.response?.data?.message || 'Failed to process return request');
     }
   };
 
-  if (loading) return <LoadingSpinner fullScreen />;
+  if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="animate-fade-in" style={{ padding: '2rem' }}>
+    <div className="animate-fade-in" style={{ padding: '2rem 1rem' }}>
       <h1 style={{ marginBottom: '2rem' }}>Returns Processing</h1>
-      
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' }}>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
         {returns.length === 0 ? (
           <div className="card" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem' }}>
             No pending returns to process.
           </div>
         ) : (
           returns.map(r => (
-            <div key={r.id} className="card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                <span className="badge badge-info">{r.type}</span>
-                <OrderStatusBadge status={r.status} />
-              </div>
-              
-              <h3 style={{ marginBottom: '0.5rem' }}>{r.product.name}</h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem' }}>
-                Order #{r.order.id.slice(0,8)} | User: {r.user.name}
-              </p>
-              
-              <div style={{ background: 'var(--surface2)', padding: '1rem', borderRadius: '8px', fontStyle: 'italic', marginBottom: '1.5rem' }}>
-                "{r.reason}"
+            <div key={r.id} className="card" style={{ display: 'flex', flexDirection: 'column', justifyBetween: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                  <span className="badge badge-info">{r.type}</span>
+                  <OrderStatusBadge status={r.status} />
+                </div>
+
+                <h3 style={{ marginBottom: '0.5rem' }}>{r.product?.name}</h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+                  Order #{r.orderId} | User: {r.userName}
+                </p>
+
+                <div style={{ background: 'var(--surface2)', padding: '1rem', borderRadius: '8px', fontStyle: 'italic', marginBottom: '1.5rem', color: 'var(--text-muted)' }}>
+                  "{r.reason}"
+                </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <button className="btn btn-success" style={{ flex: 1, background: 'var(--success)', color: 'white' }} onClick={() => handleProcess(r.id, 'RETURN_APPROVED')}>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: 'auto' }}>
+                <button className="btn btn-success" style={{ flex: 1, background: 'var(--success)', color: 'white' }} onClick={() => handleProcess(r.id, true)}>
                   Approve
                 </button>
-                <button className="btn btn-danger" style={{ flex: 1 }} onClick={() => handleProcess(r.id, 'REJECTED')}>
+                <button className="btn btn-danger" style={{ flex: 1 }} onClick={() => handleProcess(r.id, false)}>
                   Reject
                 </button>
               </div>

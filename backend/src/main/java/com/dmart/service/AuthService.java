@@ -89,4 +89,16 @@ public class AuthService {
                 .role(user.getRole())
                 .build();
     }
+
+    @Transactional
+    public User updateProfile(Long userId, com.dmart.dto.request.UpdateProfileRequest request, HttpServletRequest httpRequest) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new com.dmart.exception.ResourceNotFoundException("User not found"));
+        user.setName(request.getName());
+        user.setPhone(request.getPhone());
+        user.setAddress(request.getAddress());
+        user = userRepository.save(user);
+        auditLogService.log(userId, "UPDATE_PROFILE", "User", userId, "Updated profile details", httpRequest);
+        return user;
+    }
 }

@@ -13,19 +13,21 @@ const AuditLogsPage = () => {
 
   const fetchLogs = async () => {
     try {
-      const data = await getAuditLogs();
-      setLogs(data);
+      // getAuditLogs returns PageResponse: { content, page, size, totalElements, totalPages }
+      const data = await getAuditLogs({ page: 0, size: 100 });
+      setLogs(data?.content || []);
     } catch (err) {
       toast.error('Failed to fetch audit logs');
+      setLogs([]);
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) return <LoadingSpinner fullScreen />;
+  if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="animate-fade-in" style={{ padding: '2rem' }}>
+    <div className="container animate-fade-in" style={{ padding: '2rem 1rem' }}>
       <h1 style={{ marginBottom: '2rem' }}>Audit Logs</h1>
 
       <div className="card" style={{ padding: 0, overflowX: 'auto' }}>
@@ -45,7 +47,7 @@ const AuditLogsPage = () => {
             ) : (
               logs.map(l => (
                 <tr key={l.id} style={{ borderBottom: '1px solid var(--surface3)' }}>
-                  <td style={{ padding: '1rem', whiteSpace: 'nowrap' }}>{new Date(l.timestamp).toLocaleString()}</td>
+                  <td style={{ padding: '1rem', whiteSpace: 'nowrap' }}>{new Date(l.timestamp).toLocaleString('en-IN')}</td>
                   <td style={{ padding: '1rem' }}>{l.userEmail || 'System'}</td>
                   <td style={{ padding: '1rem' }}>
                     <span className="badge badge-default">{l.action}</span>

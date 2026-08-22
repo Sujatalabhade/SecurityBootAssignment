@@ -15,10 +15,12 @@ const InventoryPage = () => {
 
   const fetchInventory = async () => {
     try {
-      const data = await getInventory();
-      setProducts(data);
+      // getInventory returns a PageResponse: { content, page, size, totalElements, totalPages }
+      const data = await getInventory({ page: 0, size: 100 });
+      setProducts(data?.content || []);
     } catch (err) {
       toast.error('Failed to load inventory');
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -27,9 +29,9 @@ const InventoryPage = () => {
   const handleStockUpdate = async (id, currentStock) => {
     const qty = prompt('Enter quantity to ADD to stock:', '10');
     if (!qty || isNaN(qty)) return;
-    
+
     try {
-      await updateStock({ productId: id, quantity: parseInt(qty) });
+      await updateStock({ productId: id, quantity: parseInt(qty), notes: 'Restock via dashboard' });
       toast.success('Stock updated');
       fetchInventory();
     } catch (err) {
@@ -37,23 +39,23 @@ const InventoryPage = () => {
     }
   };
 
-  if (loading) return <LoadingSpinner fullScreen />;
+  if (loading) return <LoadingSpinner />;
 
-  const filtered = products.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filtered = products.filter(p => p.name?.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
-    <div className="animate-fade-in" style={{ padding: '2rem' }}>
+    <div className="container animate-fade-in" style={{ padding: '2rem 1rem' }}>
       <h1 style={{ marginBottom: '2rem' }}>Inventory Management</h1>
-      
+
       <div className="card" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
         <Search size={20} color="var(--text-muted)" />
-        <input 
-          type="text" 
-          className="input" 
-          placeholder="Search inventory..." 
-          value={searchTerm} 
-          onChange={(e) => setSearchTerm(e.target.value)} 
-          style={{ flex: 1 }} 
+        <input
+          type="text"
+          className="input"
+          placeholder="Search inventory..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ flex: 1 }}
         />
       </div>
 
@@ -69,28 +71,32 @@ const InventoryPage = () => {
             </tr>
           </thead>
           <tbody>
-            {filtered.map(p => (
-              <tr key={p.id} style={{ borderBottom: '1px solid var(--surface3)' }}>
-                <td style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ width: '40px', height: '40px', background: 'var(--surface2)', borderRadius: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Package size={20} />
-                  </div>
-                  {p.name}
-                </td>
-                <td style={{ padding: '1rem' }}>{p.category}</td>
-                <td style={{ padding: '1rem' }}>₹{p.price}</td>
-                <td style={{ padding: '1rem' }}>
-                  <span className={`badge ${p.stockQuantity <= 5 ? 'badge-error' : p.stockQuantity <= 20 ? 'badge-warning' : 'badge-success'}`}>
-                    {p.stockQuantity} in stock
-                  </span>
-                </td>
-                <td style={{ padding: '1rem' }}>
-                  <button className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }} onClick={() => handleStockUpdate(p.id, p.stockQuantity)}>
-                    Restock
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {filtered.length === 0 ? (
+              <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center' }}>No products found</td></tr>
+            ) : (
+              filtered.map(p => (
+                <tr key={p.id} style={{ borderBottom: '1px solid var(--surface3)' }}>
+                  <td style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ width: '40px', height: '40px', background: 'var(--surface2)', borderRadius: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <Package size={20} />
+                    </div>
+                    {p.name}
+                  </td>
+                  <td style={{ padding: '1rem' }}>{p.categoryName}</td>
+                  <td style={{ padding: '1rem' }}>₹{Number(p.price).toFixed(2)}</td>
+                  <td style={{ padding: '1rem' }}>
+                    <span className={`badge ${(p.stockQty ?? 0) <= 5 ? 'badge-error' : (p.stockQty ?? 0) <= 20 ? 'badge-warning' : 'badge-success'}`}>
+                      {p.stockQty ?? 0} in stock
+                    </span>
+                  </td>
+                  <td style={{ padding: '1rem' }}>
+                    <button className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }} onClick={() => handleStockUpdate(p.id, p.stockQty)}>
+                      Restock
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
