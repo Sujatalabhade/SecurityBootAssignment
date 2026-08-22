@@ -8,6 +8,12 @@
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-blue)](https://www.mysql.com/)
 [![Vite](https://img.shields.io/badge/Vite-8.x-purple)](https://vitejs.dev/)
 
+## 🌐 Live Deployments
+
+- **Frontend Application (Vercel):** [https://security-boot-assignment.vercel.app](https://security-boot-assignment.vercel.app)
+- **Backend API (Clever Cloud):** [https://app-3cb4fbc2-5c60-44a0-8577-2d18a1b8ade3.cleverapps.io](https://app-3cb4fbc2-5c60-44a0-8577-2d18a1b8ade3.cleverapps.io)
+- **Database (Clever Cloud):** MySQL 8 Shared instance
+
 ---
 
 ## 📖 Project Overview
@@ -35,7 +41,7 @@ Mini D-Mart is a full-stack grocery store application that allows customers to b
                      │ HTTP REST (Axios + JWT)
 ┌────────────────────▼────────────────────────────────┐
 │              Spring Boot 3.3.5                       │
-│           (Render — backend)                         │
+│         (Clever Cloud — backend)                     │
 │   http://localhost:8080  (dev)                       │
 └────────────────────┬────────────────────────────────┘
                      │ JPA / Hibernate
@@ -253,11 +259,11 @@ npm run build
 # vercel.json handles SPA routing
 ```
 
-### Backend — Render
-1. Connect GitHub repo to Render
-2. Set build command: `cd backend && mvn clean package -DskipTests`
-3. Set start command: `java -jar backend/target/dmart-backend-*.jar`
-4. Set environment variables (see `.env.example`)
+### Backend — Clever Cloud
+1. Create a **Java + Maven** application in Clever Cloud.
+2. Link your MySQL database add-on (`dmart-db`) as a service dependency to automatically inject database credentials.
+3. Set `CC_MAVEN_SUBFOLDER` environment variable to `backend` (and configure `CC_JAVA_VERSION` to `21`).
+4. Trigger the build using `clevercloud/maven.json` build descriptor in the root directory.
 
 ---
 
